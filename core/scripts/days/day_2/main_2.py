@@ -79,6 +79,22 @@ def FileImport():
     return (processedSilver, processedGold)
 
 def SilverSolution(solutionData):
+    """
+    Calculate the total of valid game IDs based on specific play rules.
+
+    Processes a dictionary of game data where each key is a game identifier and the value is a string 
+    representing the sequence of plays. Each play is categorized by color (red 'r', green 'g', or blue 'b') 
+    followed by a number. Validates each play against color-specific rules:
+    - Red plays ('r') must have a number <= 12
+    - Green plays ('g') must have a number <= 13
+    - Blue plays (default) must have a number <= 14
+    Invalid plays result in the game's ID being set to 0. The function sums and returns the total of all valid game IDs.
+
+    :param solutionData: A dictionary with game identifiers as keys and strings of game plays as values.
+    :type solutionData: dict
+    :returns: The sum of valid game IDs after applying the play validation rules.
+    :rtype: int
+    """
     print("\nSILVER SOLUTION OUTPUTS: ")
     idTotals = 0
     for game in solutionData:
@@ -119,10 +135,23 @@ def SilverSolution(solutionData):
         # Add idTotals
         idTotals = idTotals + currentID
         print(f"Game {currentID}: {solutionData[game].strip()} -> Total ID Sum: {idTotals}")
-
     return idTotals
 
 def GoldSolution(solutionData):
+    """
+    Calculate the total "power" of all games based on the highest numbers drawn in each color category.
+
+    This function processes a dictionary of game data where each key is a game identifier and the value is a string 
+    representing the sequence of plays in the game. Each play is categorized by color (red 'r', green 'g', or blue 'b') 
+    followed by a number. The function determines the highest number drawn for each color in each game and calculates 
+    the game's "power" as the product of these highest numbers across the three color categories. It sums and returns 
+    the total "power" for all games.
+
+    :param solutionData: A dictionary with game identifiers as keys and strings of game plays as values.
+    :type solutionData: dict
+    :returns: The total "power" calculated across all games.
+    :rtype: int
+    """
     print("\nGOLD SOLUTION OUTPUTS: ")
     gamePowerTotals = 0
     for game in solutionData:
