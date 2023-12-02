@@ -15,7 +15,7 @@ def RunSolution():
     silver = SilverSolution(processedFile[0])
     # Get the gold star solution.
     golden = GoldSolution(processedFile[1])
-    print(f"The Silver Solution to Day 2 -> {silver}")
+    print(f"\nThe Silver Solution to Day 2 -> {silver}")
     print(f"The Golden Solution to Day 2 -> {golden}")
 
 def FileImport():
@@ -79,6 +79,7 @@ def FileImport():
     return (processedSilver, processedGold)
 
 def SilverSolution(solutionData):
+    print("\nSILVER SOLUTION OUTPUTS: ")
     idTotals = 0
     for game in solutionData:
         # First we get the information off of the current game.
@@ -117,24 +118,12 @@ def SilverSolution(solutionData):
                         print("No number can be found!")
         # Add idTotals
         idTotals = idTotals + currentID
+        print(f"Game {currentID}: {solutionData[game].strip()} -> Total ID Sum: {idTotals}")
 
     return idTotals
 
 def GoldSolution(solutionData):
-    """
-    Processes the provided solution data to find the golden solution.
-
-    This function takes in data, typically from a file or a similar source, processes it to figure out the solution, 
-    and then returns that solution. The current implementation is a placeholder and indicates if the day's solution 
-    has not been completed yet.
-
-    Args:
-        solutionData (type): The data that needs to be processed to find the solution. 
-                             The exact type of this data depends on what the solution requires.
-
-    Returns:
-        str: The results of the current day.
-    """
+    print("\nGOLD SOLUTION OUTPUTS: ")
     gamePowerTotals = 0
     for game in solutionData:
         highestNumbers = [0, 0, 0] # [R, G, B]
@@ -142,6 +131,7 @@ def GoldSolution(solutionData):
         currentGame = solutionData[game]
         currentGame = currentGame.split(":")
         # Storing the ID, ready to process the rest of the game.
+        currentID = currentGame[0]
         currentGame = currentGame[1]
         # Then getting all the rounds.
         currentGameRounds = currentGame.split(";")
@@ -173,4 +163,5 @@ def GoldSolution(solutionData):
                         print("No number can be found!")
         # Calculate game power and add it on
         gamePowerTotals = gamePowerTotals + (highestNumbers[0] * highestNumbers[1] * highestNumbers[2])
+        print(f"Game {currentID}: {solutionData[game].strip()} -> Power: {highestNumbers[0] * highestNumbers[1] * highestNumbers[2]} -> Total: {gamePowerTotals}") # Debug print.
     return gamePowerTotals
