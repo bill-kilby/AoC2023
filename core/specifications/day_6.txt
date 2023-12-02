@@ -1,0 +1,5 @@
+-: Day Six :-
+
+{Insert problem here}
+
+Link to problem: https://adventofcode.com/2023/day/6
