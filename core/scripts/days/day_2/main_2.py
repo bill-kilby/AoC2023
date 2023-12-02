@@ -59,8 +59,20 @@ def FileImport():
         scriptDirectory = scriptDirectory.replace("\scripts\days\day_2", "") # Removing up to core.
         scriptDirectory = scriptDirectory+"\inputs\day_2\gold.txt" # Adding the file import.
         with open(scriptDirectory) as daySpec:
-            #TODO: Process the file import here depending on what comes.
-            processedGold = 0
+            # Identical - today, the puzzle input has not changed.
+            processedGold = {}
+            i = 1
+            for line in daySpec:
+                # Cleaning up the string. This is likely pretty inefficient but running low on time today.
+                # TODO: Make the string cleanup more efficient (regex?)
+                line = line.replace(" ", "")
+                line = line.replace("Game", "")
+                line = line.replace("blue", "b")
+                line = line.replace("red", "r")
+                line = line.replace("green", "g")
+                # Storing the line, and interating.
+                processedGold[i] = line
+                i = i + 1
     except:
         raise FileNotFoundError(f"Day 2's gold import file cannot be found!")
     # Returning the found processed silver, and gold, imports.
@@ -97,17 +109,26 @@ def SilverSolution(solutionData):
             for draw in currentRoundDraws:
                 # Looping through every draw, seeing if it breaks the rules.
                 if ("r" in draw): # Red
-                    draw = int(draw.replace("r", ""))
-                    if (draw > 12):
-                        currentID = 0
+                    try:
+                        draw = int(draw.replace("r", ""))
+                        if (draw > 12):
+                            currentID = 0
+                    except:
+                        print("No number can be found!")
                 elif ("g" in draw): # Green
-                    draw = int(draw.replace("g", ""))
-                    if (draw > 13):
-                        currentID = 0
+                    try:
+                        draw = int(draw.replace("g", ""))
+                        if (draw > 13):
+                            currentID = 0
+                    except:
+                        print("No number can be found!")
                 else: # Blue
-                    draw = int(draw.replace("b", ""))
-                    if (draw > 14):
-                        currentID = 0
+                    try:
+                        draw = int(draw.replace("b", ""))
+                        if (draw > 14):
+                            currentID = 0
+                    except:
+                        print("No number can be found!")
         # Add idTotals
         idTotals = idTotals + currentID
 
