@@ -79,20 +79,6 @@ def FileImport():
     return (processedSilver, processedGold)
 
 def SilverSolution(solutionData):
-    """
-    Processes the provided solution data to find the silver solution.
-
-    This function takes in data, typically from a file or a similar source, processes it to figure out the solution, 
-    and then returns that solution. The current implementation is a placeholder and indicates if the day's solution 
-    has not been completed yet.
-
-    Args:
-        solutionData (type): The data that needs to be processed to find the solution. 
-                             The exact type of this data depends on what the solution requires.
-
-    Returns:
-        str: The results of the current day.
-    """
     idTotals = 0
     for game in solutionData:
         # First we get the information off of the current game.
@@ -149,6 +135,42 @@ def GoldSolution(solutionData):
     Returns:
         str: The results of the current day.
     """
-    #TODO: Process the data, figure out the solution, and return the solution.
-    print("")
-    return "Day has not been completed yet!"
+    gamePowerTotals = 0
+    for game in solutionData:
+        highestNumbers = [0, 0, 0] # [R, G, B]
+        # First we get the information off of the current game.
+        currentGame = solutionData[game]
+        currentGame = currentGame.split(":")
+        # Storing the ID, ready to process the rest of the game.
+        currentGame = currentGame[1]
+        # Then getting all the rounds.
+        currentGameRounds = currentGame.split(";")
+        for round in currentGameRounds:
+            # Looping through every round, and getting each "play".
+            currentRoundDraws = round.split(",")
+            for draw in currentRoundDraws:
+                # Looping through every draw, seeing if it is larger than the previous one.
+                if ("r" in draw): # Red
+                    try:
+                        draw = int(draw.replace("r", ""))
+                        if (draw > highestNumbers[0]):
+                            highestNumbers[0] = draw
+                    except:
+                        print("No number can be found!")
+                elif ("g" in draw): # Green
+                    try:
+                        draw = int(draw.replace("g", ""))
+                        if (draw > highestNumbers[1]):
+                            highestNumbers[1] = draw
+                    except:
+                        print("No number can be found!")
+                else: # Blue
+                    try:
+                        draw = int(draw.replace("b", ""))
+                        if (draw > highestNumbers[2]):
+                            highestNumbers[2] = draw
+                    except:
+                        print("No number can be found!")
+        # Calculate game power and add it on
+        gamePowerTotals = gamePowerTotals + (highestNumbers[0] * highestNumbers[1] * highestNumbers[2])
+    return gamePowerTotals
