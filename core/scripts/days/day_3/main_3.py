@@ -12,7 +12,7 @@ def RunSolution():
     # Getting the file contents.
     processedFile = FileImport()
     # Get the silver star solution.
-    silver = SilverSolution(processedFile[0])
+    silver = Silver2(processedFile[0])
     # Get the gold star solution.
     golden = GoldSolution(processedFile[1])
     print(f"The Silver Solution to Day 3 -> {silver}")
@@ -65,22 +65,64 @@ def FileImport():
     # Returning the found processed silver, and gold, imports.
     return (processedSilver, processedGold)
 
+def Silver2(data):
+    enginePartSum = 0
+    for y in range(len(data)):
+        for x in range(len(data[y])):
+            if data[y][x].isdigit():
+                # Check if the current digit is adjacent to a symbol
+                if TestForSymbols(data, x, y):
+                    # Form the complete number starting at this digit
+                    currentNumber = data[y][x]
+                    offset = 1
+                    while x + offset < len(data[y]) and data[y][x + offset].isdigit():
+                        currentNumber += data[y][x + offset]
+                        offset += 1
+                    enginePartSum += int(currentNumber)
+                    # Skip the rest of the digits in this number
+                    x += offset - 1
+    return enginePartSum
+
 def SilverSolution(solutionData):
     # Treat the schematic as a 2D array: loop through, until a number is found, and see if that number is true. 
     # Then check the right index to see if there's another number.
     enginePartSum = 0
+    currentNumber = ""
+    isValid = False
+    validNumber = False
     print(f"Y TOTAL {len(solutionData)}. X TOTAL {len(solutionData[0])}")
     for y in range (0, len(solutionData)):
-        for x in range (0, len(solutionData[y])-1):
+        print("")
+        for x in range (0, len(solutionData[y])):
+            print(f"Current digit: {solutionData[y][x]}")
             isValid = TestForSymbols(solutionData, x, y) # Testing for symbols
-            # If it is valid -> then check for number next to it (check if x+1 is .)
-            # If there is no number, then if valid, add to engine part sum.
-            print(f"Current symbol: {solutionData[y][x]} -> {isValid}")
+            try:
+                int(solutionData[y][x]) # Checking if integer.
+                print(f"{solutionData[y][x]} is a digit!")
+                currentNumber = currentNumber + str(solutionData[y][x]) # Adding on coordinate number to current number.
+                if(isValid and validNumber == False):
+                   validNumber = True
+            except:
+                # If its not an integer, add it on, THEN reset number.
+                if(validNumber == True):
+                    enginePartSum = enginePartSum + int(currentNumber)
+                validNumber = False
+                currentNumber = ""
+            print(f"Current total : {enginePartSum}")
+        # Resetting values on another line.
+        if(validNumber == True):
+            enginePartSum = enginePartSum + int(currentNumber)
+        validNumber = False
+        currentNumber = ""
+    # If the grid is over, add the final number and continue.
+    if(validNumber == True):
+        enginePartSum = enginePartSum + int(currentNumber)
     return enginePartSum
 
 def TestForSymbols(solutionData, x, y):
     # This is incredibly in(if)ficient.
-    symbols = ["#", "*", "/", "%", "=", "@", "$", "+", "-"]
+    # TODO: Refactor this so that the input has a border.
+    symbols = ["/", "@", "%", "=", "-", "+", "*", "$"]
     if ((y == 0) and (x == 0)):
         # If 0,0 -> Check east, south-east and south.
         if(solutionData[y][x+1] in symbols): # East
@@ -98,6 +140,7 @@ def TestForSymbols(solutionData, x, y):
         elif(solutionData[y+1][x] in symbols): # South
             return True
     elif ((y == len(solutionData)-1) and (x == 0)):
+        print("BOTTOM LEFT")
         # If x,y..n -> Check north, north-east, east.
         if (solutionData[y-1][x] in symbols): # North
             return True
@@ -106,6 +149,7 @@ def TestForSymbols(solutionData, x, y):
         elif (solutionData[y][x+1] in symbols): # East
             return True
     elif((y == len(solutionData)-1) and (x == len(solutionData[y])-1)):
+        print("BOTTOM RIGHT")
         # If x..n,y..n -> Check north, north-west, west.
         if (solutionData[y-1][x] in symbols): # North
             return True
@@ -201,3 +245,4 @@ def GoldSolution(solutionData):
     #TODO: Process the data, figure out the solution, and return the solution.
     print("")
     return "Day has not been completed yet!"
+
