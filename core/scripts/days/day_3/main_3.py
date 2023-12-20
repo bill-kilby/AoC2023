@@ -37,7 +37,7 @@ def FileImport():
         scriptDirectory = scriptDirectory.replace("\scripts\days\day_3", "") # Removing up to core.
         scriptDirectory = scriptDirectory+"\inputs\day_3\silver.txt" # Adding the file import.
         with open(scriptDirectory) as daySpec:
-            # Saving the input as a simple 2D array.
+            # Saving the input as a simple 2D array. TODO: Add a border to this.
             processedSilver = []
             for line in daySpec:
                 currentLine = []
@@ -53,13 +53,6 @@ def FileImport():
         scriptDirectory = scriptDirectory.replace("\scripts\days\day_3", "") # Removing up to core.
         scriptDirectory = scriptDirectory+"\inputs\day_3\gold.txt" # Adding the file import.
         with open(scriptDirectory) as daySpec:
-            # Saving the input as a simple 2D array.
-            processedGold = []
-            for line in daySpec:
-                currentLine = []
-                for char in line:
-                    currentLine.append(char)
-                processedGold.append(currentLine)
     except:
         raise FileNotFoundError(f"Day 3's gold import file cannot be found!")
     # Returning the found processed silver, and gold, imports.
@@ -86,146 +79,7 @@ def Silver2(data):
 def SilverSolution(solutionData):
     # Treat the schematic as a 2D array: loop through, until a number is found, and see if that number is true. 
     # Then check the right index to see if there's another number.
-    enginePartSum = 0
-    currentNumber = ""
-    isValid = False
-    validNumber = False
-    print(f"Y TOTAL {len(solutionData)}. X TOTAL {len(solutionData[0])}")
-    for y in range (0, len(solutionData)):
-        print("")
-        for x in range (0, len(solutionData[y])):
-            print(f"Current digit: {solutionData[y][x]}")
-            isValid = TestForSymbols(solutionData, x, y) # Testing for symbols
-            try:
-                int(solutionData[y][x]) # Checking if integer.
-                print(f"{solutionData[y][x]} is a digit!")
-                currentNumber = currentNumber + str(solutionData[y][x]) # Adding on coordinate number to current number.
-                if(isValid and validNumber == False):
-                   validNumber = True
-            except:
-                # If its not an integer, add it on, THEN reset number.
-                if(validNumber == True):
-                    enginePartSum = enginePartSum + int(currentNumber)
-                validNumber = False
-                currentNumber = ""
-            print(f"Current total : {enginePartSum}")
-        # Resetting values on another line.
-        if(validNumber == True):
-            enginePartSum = enginePartSum + int(currentNumber)
-        validNumber = False
-        currentNumber = ""
-    # If the grid is over, add the final number and continue.
-    if(validNumber == True):
-        enginePartSum = enginePartSum + int(currentNumber)
-    return enginePartSum
-
-def TestForSymbols(solutionData, x, y):
-    # This is incredibly in(if)ficient.
-    # TODO: Refactor this so that the input has a border.
-    symbols = ["/", "@", "%", "=", "-", "+", "*", "$"]
-    if ((y == 0) and (x == 0)):
-        # If 0,0 -> Check east, south-east and south.
-        if(solutionData[y][x+1] in symbols): # East
-            return True
-        elif(solutionData[y+1][x+1] in symbols): # South-east
-            return True
-        elif(solutionData[y+1][x] in symbols): # South
-            return True
-    elif ((y==0) and (x == len(solutionData[y])-1)):
-        # If x..n,y -> Check west, south-west and south.
-        if(solutionData[y][x-1] in symbols): # West
-            return True
-        elif(solutionData[y+1][x-1] in symbols): # South-west
-            return True
-        elif(solutionData[y+1][x] in symbols): # South
-            return True
-    elif ((y == len(solutionData)-1) and (x == 0)):
-        print("BOTTOM LEFT")
-        # If x,y..n -> Check north, north-east, east.
-        if (solutionData[y-1][x] in symbols): # North
-            return True
-        elif (solutionData[y-1][x+1] in symbols): # North-east
-            return True
-        elif (solutionData[y][x+1] in symbols): # East
-            return True
-    elif((y == len(solutionData)-1) and (x == len(solutionData[y])-1)):
-        print("BOTTOM RIGHT")
-        # If x..n,y..n -> Check north, north-west, west.
-        if (solutionData[y-1][x] in symbols): # North
-            return True
-        elif (solutionData[y-1][x-1] in symbols): # North-west
-            return True
-        elif (solutionData[y][x-1] in symbols): # West
-            return True
-    elif((y == 0)):
-        # If x,0 -> west, south-west, south, south-east, east.
-        if (solutionData[y][x-1] in symbols): # West
-            return True
-        elif(solutionData[y+1][x-1] in symbols): # South-west
-            return True
-        elif(solutionData[y+1][x] in symbols): # South
-            return True
-        elif(solutionData[y][x+1] in symbols): # East
-            return True
-        elif(solutionData[y+1][x+1] in symbols): # South-east
-            return True
-    elif((y == len(solutionData)-1)):
-        # If x,y..n -> west, north-west, north, north-east, east.
-        if(solutionData[y][x-1] in symbols): # West
-            return True
-        elif (solutionData[y-1][x-1] in symbols): # North-west
-            return True
-        elif (solutionData[y-1][x] in symbols): # North
-            return True
-        elif (solutionData[y-1][x+1] in symbols): # North-east
-            return True
-        elif (solutionData[y][x+1] in symbols): # East
-            return True
-    elif((x == 0)):
-        # If 0,y -> north, north-east, east, south-east, south.
-        if (solutionData[y-1][x] in symbols): # North
-            return True
-        elif (solutionData[y-1][x+1] in symbols): # North-east
-            return True
-        elif (solutionData[y][x+1] in symbols): # East
-            return True
-        elif(solutionData[y+1][x+1] in symbols): # South-east
-            return True
-        elif(solutionData[y+1][x] in symbols): # South
-            return True
-    elif((x == len(solutionData[y])-1)):
-        # If x..n,y -> north, north-west, west, south-west, south.
-        if (solutionData[y-1][x] in symbols): # North
-            return True
-        elif (solutionData[y-1][x-1] in symbols): # North-west
-            return True
-        elif (solutionData[y][x-1] in symbols): # West
-            return True
-        elif(solutionData[y+1][x-1] in symbols): # South-west
-            return True
-        elif(solutionData[y+1][x] in symbols): # South
-            return True
-    else:
-        # Else, it's not going to be an edge-case (bdmtshh), so just scan all around.
-        # If x!=0,y!=0 -> north, north-east, east, south-east, south, south-west, west, north-west.
-        if (solutionData[y-1][x] in symbols): # North
-            return True
-        elif (solutionData[y-1][x+1] in symbols): # North-east
-            return True
-        elif (solutionData[y][x+1] in symbols): # East
-            return True
-        elif(solutionData[y+1][x+1] in symbols): # South-east
-            return True
-        elif(solutionData[y+1][x] in symbols): # South
-            return True
-        elif(solutionData[y+1][x-1] in symbols): # South-west
-            return True
-        elif (solutionData[y][x-1] in symbols): # West
-            return True
-        elif (solutionData[y-1][x-1] in symbols): # North-west
-            return True
-    
-
+    return 0
 
 def GoldSolution(solutionData):
     """
