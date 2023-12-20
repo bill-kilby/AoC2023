@@ -58,23 +58,6 @@ def FileImport():
     # Returning the found processed silver, and gold, imports.
     return (processedSilver, processedGold)
 
-def Silver2(data):
-    enginePartSum = 0
-    for y in range(len(data)):
-        for x in range(len(data[y])):
-            if data[y][x].isdigit():
-                # Check if the current digit is adjacent to a symbol
-                if TestForSymbols(data, x, y):
-                    # Form the complete number starting at this digit
-                    currentNumber = data[y][x]
-                    offset = 1
-                    while x + offset < len(data[y]) and data[y][x + offset].isdigit():
-                        currentNumber += data[y][x + offset]
-                        offset += 1
-                    enginePartSum += int(currentNumber)
-                    # Skip the rest of the digits in this number
-                    x += offset - 1
-    return enginePartSum
 
 def SilverSolution(solutionData):
     # Treat the schematic as a 2D array: loop through, until a number is found, and see if that number is true. 
