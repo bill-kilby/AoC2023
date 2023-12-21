@@ -1,3 +1,4 @@
+from msvcrt import SEM_NOALIGNMENTFAULTEXCEPT
 import os
 
 def RunSolution():
@@ -11,7 +12,6 @@ def RunSolution():
     print("Running Day 4 Solution...")
     # Getting the file contents.
     processedFile = FileImport()
-    print(processedFile)
     # Get the silver star solution.
     silver = SilverSolution(processedFile[0])
     # Get the gold star solution.
@@ -97,9 +97,10 @@ def SilverSolution(solutionData):
         totalWinning = totalWinning + GetCardTotal(card)
     return totalWinning
 
-def GetCardWinners(card, index):
+def GetCardWinners(card, index, solutions):
     # This feels pretty inefficient -> surely a better way than just looping through? Potential sorting (timsort?) and then searching?
     totalWinningNumbers = 0
+    totalCards = 0
     # Loop through the winning cards.
     for winningNumber in card[0]:
         # Loop through the actual cards
@@ -107,39 +108,33 @@ def GetCardWinners(card, index):
             # If they won, add 1 to the total number of winnings.
             if (winningNumber == actualNumber):
                 totalWinningNumbers = totalWinningNumbers + 1
-    print(f"Card completed with {totalWinningNumbers} matches!")
-    # Now that the winners have been found, return a tuple containing (amountOfWinners, [nextCards])
-    cardWinners = (totalWinningNumbers, [])
-    # Add the future winners.
-    for i in range(1, totalWinningNumbers+1):
-        cardWinners[1].append(index+i)
-    return cardWinners
+    print(f"Card has won another {totalWinningNumbers}.")
+    totalCards = totalCards + totalWinningNumbers
+    # Loop through the amount of winning numbers and add their solutions.
+    for i in range (1, totalWinningNumbers+1):
+        print(f"In addition, adding Card {index+i}'s extra {solutions.get(index+i)} cards.")
+        totalCards  = totalCards + solutions.get(index+i)
+    print(f"Therefore, this card has a total of {totalCards} extra cards.")
+    # Then return the total amount of cards
+    return totalCards
 
 
 def GoldSolution(solutionData):
-    # Variable for holding the total amount scratch cards done.
-    totalScratchcardAmount = len(solutionData)
-    # Dictionary fo holding the solutions of each card.
+    print("\nRunning Gold Solution")
+    # Set up empty dictionary.
     scratchcardSolutions = {}
-    # Setting up the initial card queue with all numbers for (amount of cards)
-    cardQueue = []
-    # First we need to find all solutions to the cards.
-    for card in range(0, len(solutionData)):
-        scratchcardSolutions[card] = GetCardWinners(solutionData[card], card)
-        # Also add the card to the queue while we're here.
-        cardQueue.append(card)
+    for i in range(0, len(solutionData)):
+        scratchcardSolutions[i] = 0
     print(scratchcardSolutions)
-    print("\nStarting scratch card processing:")
-    # While cardQueue is not empty.
-    while len(cardQueue) != 0:
-        # Get the current card's data.
-        cardData = scratchcardSolutions.get(cardQueue[0])
-        # Add the total amount of new cards if there are some.
-        if (cardData[0] != 0):
-            print(f"Processed {cardQueue[0]}! {cardData[0]} more cards added! Containing: {cardData[1]}.")
-            totalScratchcardAmount = totalScratchcardAmount + cardData[0]
-            # Then add the new cards to the queue.
-            cardQueue.extend(cardData[1])
-        # Then remove the current card we just processed.
-        cardQueue.pop(0)
+    # Set up the total result as the initial set.
+    totalScratchcardAmount = len(solutionData)
+    print(solutionData)
+    # Loop from end to start.
+    for card in range(len(solutionData)-1, -1, -1):
+        print(f"\nCalculating card {card}.")
+        # Getting the total amount of added cards.
+        scratchcardSolutions[card] = GetCardWinners(solutionData[card], card, scratchcardSolutions)
+        # Adding it to the total
+        totalScratchcardAmount = totalScratchcardAmount + scratchcardSolutions[card]
+    # Once all cards are done, return the total.
     return totalScratchcardAmount
