@@ -60,7 +60,22 @@ def FileImport():
         scriptDirectory = os.path.dirname(__file__) # Finding the current directory string.
         scriptDirectory = scriptDirectory.replace("\scripts\days\day_3", "") # Removing up to core.
         scriptDirectory = scriptDirectory+"\inputs\day_3\gold.txt" # Adding the file import.
-        processedGold= [1]
+        with open(scriptDirectory) as daySpec:
+            # Saving the input as a simple 2D array with a border of Bs. Identical to silver today.
+            processedGold = []
+            firstLine = True
+            for line in daySpec:
+                if (firstLine == True):
+                    lineLength = len(line)
+                    processedGold.append("B"*(lineLength + 2))
+                    firstLine = False
+                currentLine = ["B"]
+                for char in line:
+                    if (char != "\n"): # Ignore endline chars.
+                      currentLine.append(char)
+                currentLine.append("B")
+                processedGold.append(currentLine)
+            processedGold.append("B"*(lineLength + 2))
     except:
         raise FileNotFoundError(f"Day 3's gold import file cannot be found!")
     # Returning the found processed silver, and gold, imports.
@@ -120,22 +135,95 @@ def SilverSolution(solutionData):
                 valid = False
     return totalNumber
 
+def GetFullNumber(data, line, char):
+    # Setting up pointers for checking if the number is continuing.
+    leftPointer = -1
+    rightPointer = 1
+    # Variable for storing the total number found, starting with the number selected.
+    totalNumber = ""+data[line][char]
+    # Loop through while left pointer is at a digit.
+    while (data[line][char + leftPointer].isdigit()):
+        # Add number to beginning of string
+        totalNumber = data[line][char + leftPointer] + totalNumber
+        # Increment pointer by 1.
+        leftPointer = leftPointer - 1
+    # Loop through while right pointer is at a digit.
+    while (data[line][char + rightPointer].isdigit()):
+        # Add number to end of string.
+        totalNumber = totalNumber + data[line][char + rightPointer]
+        # Increment pointer by 1
+        rightPointer = rightPointer + 1
+    # Return the total number as an int
+    return int(totalNumber)
+
+
+def GetGearRatio(data, line, char):
+    # Setting up a list for all the variables sorrounding a gear
+    totalNumbers = []
+    # Checking top line.
+    left, middle, right = 0,0,0
+    if (data[line-1][char-1].isdigit()): # North west
+        left = GetFullNumber(data, line-1, char-1)
+    if (data[line-1][char].isdigit()): # North
+        middle = GetFullNumber(data, line-1, char)
+    if (data[line-1][char+1].isdigit()): # North east
+        right = GetFullNumber (data, line-1, char+1)
+    # If middle is a number, then theres only 1 number
+    if (middle != 0):
+        totalNumbers.append(middle)
+    else:
+        # Else, left and right are numbers.
+        totalNumbers.append(left)
+        totalNumbers.append(right)
+        
+    # Checking middle line. These will never overlap so immediately add to list.
+    if (data[line][char-1].isdigit()): # West
+        totalNumbers.append(GetFullNumber(data, line, char-1))
+    if (data[line][char+1].isdigit()):
+        totalNumbers.append(GetFullNumber(data, line, char+1))
+    
+    # Checking bottom line.
+    left, middle, right = 0,0,0
+    if (data[line+1][char-1].isdigit()): # South west.
+        left = GetFullNumber(data, line+1, char-1)
+    if (data[line+1][char].isdigit()): # South
+        middle = GetFullNumber(data, line+1, char)
+    if (data[line+1][char+1].isdigit()): # South east
+        right = GetFullNumber(data, line+1, char+1)
+    # Same thing, if middle is a number, theres only 1 number.
+    if (middle != 0):
+        totalNumbers.append(middle)
+    else:
+        # Else, left and right are numbers.
+        totalNumbers.append(left)
+        totalNumbers.append(right)
+
+    # Clean up total numbers by removing the null numbers (0).
+    for zero in range(0, totalNumbers.count(0)):
+        totalNumbers.remove(0)
+
+    # Now all the numbers have been collected, see if there are more than 2.
+    if (len(totalNumbers) == 2):
+        print(f"The gear is valid -> Returning {totalNumbers[0] * totalNumbers[1]}.\n")
+        # If so, return multiplication.
+        return (totalNumbers[0] * totalNumbers[1])
+    # Else return 0 as it is invalid.
+    print("The gear is invalid -> Returning 0.\n")
+    return 0
+
 def GoldSolution(solutionData):
-    """
-    Processes the provided solution data to find the golden solution.
-
-    This function takes in data, typically from a file or a similar source, processes it to figure out the solution, 
-    and then returns that solution. The current implementation is a placeholder and indicates if the day's solution 
-    has not been completed yet.
-
-    Args:
-        solutionData (type): The data that needs to be processed to find the solution. 
-                             The exact type of this data depends on what the solution requires.
-
-    Returns:
-        str: The results of the current day.
-    """
-    #TODO: Process the data, figure out the solution, and return the solution.
-    print("")
-    return "Day has not been completed yet!"
+    print(" Running gold solution")
+    totalNumber = 0
+    # Loop through all lines.
+    for line in range(1, len(solutionData)-1):
+        # Loop through all characters in line
+        for character in range (1, len(solutionData[line])-1):
+            # If it is a gear...
+            if (solutionData[line][character] == "*"):
+                print(f"Gear (*) found at ({character},{line}).")
+                # Get the gear ratio of the gear.
+                gearRatio = GetGearRatio(solutionData, line, character)
+                # Add it onto the total.
+                totalNumber = totalNumber + gearRatio
+    return totalNumber
 
