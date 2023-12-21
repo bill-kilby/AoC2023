@@ -11,8 +11,9 @@ def RunSolution():
     print("Running Day 3 Solution...")
     # Getting the file contents.
     processedFile = FileImport()
+    print(processedFile)
     # Get the silver star solution.
-    silver = Silver2(processedFile[0])
+    silver = SilverSolution(processedFile[0])
     # Get the gold star solution.
     golden = GoldSolution(processedFile[1])
     print(f"The Silver Solution to Day 3 -> {silver}")
@@ -37,14 +38,21 @@ def FileImport():
         scriptDirectory = scriptDirectory.replace("\scripts\days\day_3", "") # Removing up to core.
         scriptDirectory = scriptDirectory+"\inputs\day_3\silver.txt" # Adding the file import.
         with open(scriptDirectory) as daySpec:
-            # Saving the input as a simple 2D array. TODO: Add a border to this.
+            # Saving the input as a simple 2D array with a border of Bs.
             processedSilver = []
+            firstLine = True
             for line in daySpec:
-                currentLine = []
+                if (firstLine == True):
+                    lineLength = len(line)
+                    processedSilver.append("B"*(lineLength + 2))
+                    firstLine = False
+                currentLine = ["B"]
                 for char in line:
                     if (char != "\n"): # Ignore endline chars.
                       currentLine.append(char)
+                currentLine.append("B")
                 processedSilver.append(currentLine)
+            processedSilver.append("B"*(lineLength + 2))
     except:
         raise FileNotFoundError(f"Day 3's silver import file cannot be found!")
     # Getting the gold solution.
@@ -52,17 +60,65 @@ def FileImport():
         scriptDirectory = os.path.dirname(__file__) # Finding the current directory string.
         scriptDirectory = scriptDirectory.replace("\scripts\days\day_3", "") # Removing up to core.
         scriptDirectory = scriptDirectory+"\inputs\day_3\gold.txt" # Adding the file import.
-        with open(scriptDirectory) as daySpec:
+        processedGold= [1]
     except:
         raise FileNotFoundError(f"Day 3's gold import file cannot be found!")
     # Returning the found processed silver, and gold, imports.
     return (processedSilver, processedGold)
 
+def CheckForSymbol(data, line, char):
+    # Check around the character for special symbols.
+    symbols = ["/","*","@","%","$","+","-","=","&", "#"]
+    if data[line-1][char] in symbols:
+        return True # North
+    elif data[line-1][char+1] in symbols:
+        return True # North-east
+    elif data[line][char+1] in symbols:
+        return True # East
+    elif data[line+1][char+1] in symbols:
+        return True # South-east
+    elif data[line+1][char] in symbols:
+        return True # South
+    elif data[line+1][char-1] in symbols:
+        return True # South-west
+    elif data[line][char-1] in symbols:
+        return True # West
+    elif data[line-1][char-1] in symbols:
+        return True # North-west
+    else:
+        return False # Else no symbol was found
+    
+
 
 def SilverSolution(solutionData):
-    # Treat the schematic as a 2D array: loop through, until a number is found, and see if that number is true. 
-    # Then check the right index to see if there's another number.
-    return 0
+    # Set up variables
+    totalNumber = 0
+    currentNumber = ""
+    valid = False
+    # Loop through every line.
+    for line in range(1, len(solutionData)):
+        for character in range(1, len(solutionData[line])):
+            # If the current character is a number.
+            if (solutionData[line][character].isdigit()):
+                # Check if it is sorrounded by stuff.
+                if (CheckForSymbol(solutionData, line, character) == True):
+                    # If it is, set valid to true, and add it on.
+                    valid = True
+                elif ((CheckForSymbol(solutionData, line, character) == False) and valid == False):
+                    # If it isn't keep valid false.
+                    valid = False
+                # Either way, add it onto the total number
+                currentNumber = currentNumber + solutionData[line][character]
+            else:
+                # If it is not a digit, check if it was valid, and add on if so.
+                if (valid == True):
+                    print(f"{currentNumber} was valid. Adding onto total.")
+                    totalNumber = totalNumber + int(currentNumber)
+                    print(f"The total is now {totalNumber}.\n")
+                # Then reset variables.
+                currentNumber = ""
+                valid = False
+    return totalNumber
 
 def GoldSolution(solutionData):
     """
