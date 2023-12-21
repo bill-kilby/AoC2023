@@ -225,5 +225,6 @@ def GoldSolution(solutionData):
                 gearRatio = GetGearRatio(solutionData, line, character)
                 # Add it onto the total.
                 totalNumber = totalNumber + gearRatio
+    # Returning the sum of the gear ratios
     return totalNumber
 
