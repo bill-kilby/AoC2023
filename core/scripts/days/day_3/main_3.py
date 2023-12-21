@@ -68,7 +68,7 @@ def FileImport():
 
 def CheckForSymbol(data, line, char):
     # Check around the character for special symbols.
-    symbols = ["/","*","@","%","$","+","-","=","&", "#"]
+    symbols = ["/","*","@","%","$","+","-","=","&","#"]
     if data[line-1][char] in symbols:
         return True # North
     elif data[line-1][char+1] in symbols:
