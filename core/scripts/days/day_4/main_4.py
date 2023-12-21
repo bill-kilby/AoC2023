@@ -11,6 +11,7 @@ def RunSolution():
     print("Running Day 4 Solution...")
     # Getting the file contents.
     processedFile = FileImport()
+    print(processedFile)
     # Get the silver star solution.
     silver = SilverSolution(processedFile[0])
     # Get the gold star solution.
@@ -36,9 +37,15 @@ def FileImport():
         scriptDirectory = os.path.dirname(__file__) # Finding the current directory string.
         scriptDirectory = scriptDirectory.replace("\scripts\days\day_4", "") # Removing up to core.
         scriptDirectory = scriptDirectory+"\inputs\day_4\silver.txt" # Adding the file import.
+        processedSilver = []
         with open(scriptDirectory) as daySpec:
-            #TODO: Process the file import here depending on what comes.
-            processedSilver = 0
+            for line in daySpec:
+                # For each line, seperate the part into a tuple of ([winning], [actual])
+                cardData = line.split(":")[1]
+                winningAndActual = cardData.split("|")
+                winningNumbers = winningAndActual[0].split()
+                actualNumbers = winningAndActual[1].split()
+                processedSilver.append( (winningNumbers, actualNumbers))
     except:
         raise FileNotFoundError(f"Day 4's silver import file cannot be found!")
     # Getting the gold solution.
@@ -46,48 +53,85 @@ def FileImport():
         scriptDirectory = os.path.dirname(__file__) # Finding the current directory string.
         scriptDirectory = scriptDirectory.replace("\scripts\days\day_4", "") # Removing up to core.
         scriptDirectory = scriptDirectory+"\inputs\day_4\gold.txt" # Adding the file import.
+        processedGold = []
         with open(scriptDirectory) as daySpec:
-            #TODO: Process the file import here depending on what comes.
-            processedGold = 0
+            for line in daySpec:
+                # For each line, seperate the part into a tuple of ([winning], [actual]). Identical to silver.
+                cardData = line.split(":")[1]
+                winningAndActual = cardData.split("|")
+                winningNumbers = winningAndActual[0].split()
+                actualNumbers = winningAndActual[1].split()
+                processedGold.append( (winningNumbers, actualNumbers))
     except:
         raise FileNotFoundError(f"Day 4's gold import file cannot be found!")
     # Returning the found processed silver, and gold, imports.
     return (processedSilver, processedGold)
 
+def GetCardTotal(card):
+    # This feels pretty inefficient -> surely a better way than just looping through? Potential sorting (timsort?) and then searching?
+    totalWinningNumbers = 0
+    # Loop through the winning cards.
+    for winningNumber in card[0]:
+        # Loop through the actual cards
+        for actualNumber in card[1]:
+            # If they won, add 1 to the total number of winnings.
+            if (winningNumber == actualNumber):
+                totalWinningNumbers = totalWinningNumbers + 1
+    print(f"Card completed with {totalWinningNumbers} matches!")
+    # Now all winning cards have been calculated, calculate total power.
+    if (totalWinningNumbers != 0):
+        # Set up the initial (1) number.
+        totalNumber = 1
+        totalWinningNumbers = totalWinningNumbers - 1
+        # Loop through remaining winning numbers and loop each time. 
+        for i in range (0, totalWinningNumbers):
+            totalNumber = totalNumber * 2 # TODO: There is probably just a simple equation here rather than a forloop.
+        return totalNumber
+    return 0 # Return 0 if no winning numbers are found.
+
 def SilverSolution(solutionData):
-    """
-    Processes the provided solution data to find the silver solution.
-
-    This function takes in data, typically from a file or a similar source, processes it to figure out the solution, 
-    and then returns that solution. The current implementation is a placeholder and indicates if the day's solution 
-    has not been completed yet.
-
-    Args:
-        solutionData (type): The data that needs to be processed to find the solution. 
-                             The exact type of this data depends on what the solution requires.
-
-    Returns:
-        str: The results of the current day.
-    """
     #TODO: Process the data, figure out the solution, and return the solution.
-    print("")
-    return "Day has not been completed yet!"
+    totalWinning = 0
+    # Loop through every card and get the winning number.
+    for card in solutionData:
+        totalWinning = totalWinning + GetCardTotal(card)
+    return totalWinning
+
+def GetCardWinners(card, index):
+    # Get the total amount of card winners (same code as the first part of Silver) TODO: Refactor this into its own function.
+    # This feels pretty inefficient -> surely a better way than just looping through? Potential sorting (timsort?) and then searching?
+    totalWinningNumbers = 0
+    # Loop through the winning cards.
+    for winningNumber in card[0]:
+        # Loop through the actual cards
+        for actualNumber in card[1]:
+            # If they won, add 1 to the total number of winnings.
+            if (winningNumber == actualNumber):
+                totalWinningNumbers = totalWinningNumbers + 1
+    print(f"Card completed with {totalWinningNumbers} matches!")
+    # Now that the winners have been found, return a tuple containing (amountOfWinners, [nextCards])
+    cardWinners = (totalWinningNumbers, [])
+    # Add the future winners.
+    for i in range(1, totalWinningNumbers+1):
+        cardWinners[1].append(index+i)
+
 
 def GoldSolution(solutionData):
-    """
-    Processes the provided solution data to find the golden solution.
+    # Idea for this one: Solve for all of the scratchcards, save them in a dictionary.
+    # Dictionary of results {CardNumber: [List of future scratch cards]}
+    # Then just loop through each one iteratively like a queue.
+    #
+    # After all cards solved:
+    # Set up queue of cards
+    # For each card in queue:
+    #   Find corresponding cards
+    #   Add total amount of new cards to total
+    #   Add new cards to queue.
 
-    This function takes in data, typically from a file or a similar source, processes it to figure out the solution, 
-    and then returns that solution. The current implementation is a placeholder and indicates if the day's solution 
-    has not been completed yet.
 
-    Args:
-        solutionData (type): The data that needs to be processed to find the solution. 
-                             The exact type of this data depends on what the solution requires.
 
-    Returns:
-        str: The results of the current day.
-    """
-    #TODO: Process the data, figure out the solution, and return the solution.
-    print("")
-    return "Day has not been completed yet!"
+    # First we need to find all solutions to the cards.
+    
+    # Variable for holding the total amount scratch cards done.
+    totalScratchcardAmount = 0
+    return totalScratchcardAmount
