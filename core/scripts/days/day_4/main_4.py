@@ -98,7 +98,6 @@ def SilverSolution(solutionData):
     return totalWinning
 
 def GetCardWinners(card, index):
-    # Get the total amount of card winners (same code as the first part of Silver) TODO: Refactor this into its own function.
     # This feels pretty inefficient -> surely a better way than just looping through? Potential sorting (timsort?) and then searching?
     totalWinningNumbers = 0
     # Loop through the winning cards.
@@ -114,24 +113,33 @@ def GetCardWinners(card, index):
     # Add the future winners.
     for i in range(1, totalWinningNumbers+1):
         cardWinners[1].append(index+i)
+    return cardWinners
 
 
 def GoldSolution(solutionData):
-    # Idea for this one: Solve for all of the scratchcards, save them in a dictionary.
-    # Dictionary of results {CardNumber: [List of future scratch cards]}
-    # Then just loop through each one iteratively like a queue.
-    #
-    # After all cards solved:
-    # Set up queue of cards
-    # For each card in queue:
-    #   Find corresponding cards
-    #   Add total amount of new cards to total
-    #   Add new cards to queue.
-
-
-
-    # First we need to find all solutions to the cards.
-    
     # Variable for holding the total amount scratch cards done.
-    totalScratchcardAmount = 0
+    totalScratchcardAmount = len(solutionData)
+    # Dictionary fo holding the solutions of each card.
+    scratchcardSolutions = {}
+    # Setting up the initial card queue with all numbers for (amount of cards)
+    cardQueue = []
+    # First we need to find all solutions to the cards.
+    for card in range(0, len(solutionData)):
+        scratchcardSolutions[card] = GetCardWinners(solutionData[card], card)
+        # Also add the card to the queue while we're here.
+        cardQueue.append(card)
+    print(scratchcardSolutions)
+    print("\nStarting scratch card processing:")
+    # While cardQueue is not empty.
+    while len(cardQueue) != 0:
+        # Get the current card's data.
+        cardData = scratchcardSolutions.get(cardQueue[0])
+        # Add the total amount of new cards if there are some.
+        if (cardData[0] != 0):
+            print(f"Processed {cardQueue[0]}! {cardData[0]} more cards added! Containing: {cardData[1]}.")
+            totalScratchcardAmount = totalScratchcardAmount + cardData[0]
+            # Then add the new cards to the queue.
+            cardQueue.extend(cardData[1])
+        # Then remove the current card we just processed.
+        cardQueue.pop(0)
     return totalScratchcardAmount
