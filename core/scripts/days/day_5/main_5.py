@@ -1,4 +1,7 @@
+from math import inf
 import os
+
+# TODO: Remove all the int() calls. its inefficient, just do it on parsing.
 
 def RunSolution():
     """
@@ -81,8 +84,41 @@ def FileImport():
         scriptDirectory = scriptDirectory.replace("\scripts\days\day_5", "") # Removing up to core.
         scriptDirectory = scriptDirectory+"\inputs\day_5\gold.txt" # Adding the file import.
         with open(scriptDirectory) as daySpec:
-            #TODO: Process the file import here depending on what comes.
-            processedGold = 0
+            # Variable for storing the current section it is on.
+            currentSection = 0
+            processedGold = {"seeds": [], "seed_to_soil": [], "soil_to_fertilizer": [], "fertilizer_to_water": [],
+                               "water_to_light": [], "light_to_temperature": [], "temperature_to_humidity": [], "humidity_to_location": []}
+            # Looping through everyline to save the information.
+            for line in daySpec:
+                # Check if blank line -> If so, increase by 1.
+                if (line == "\n"):
+                    currentSection = currentSection+1
+                    # Then skip current section
+                    continue
+                if (currentSection == 0): # Seeds
+                    # Add seed information
+                    processedGold["seeds"] = line.split(":")[1].split()
+                elif(currentSection == 1): # seed to soil
+                    if(line[0].isdigit()): # Only if it part of the map.
+                        processedGold["seed_to_soil"].append(line.split())
+                elif(currentSection == 2): # soil to fertilizer
+                    if(line[0].isdigit()):
+                        processedGold["soil_to_fertilizer"].append(line.split())
+                elif(currentSection == 3): # fertilizer to water
+                    if(line[0].isdigit()):
+                        processedGold["fertilizer_to_water"].append(line.split())
+                elif(currentSection == 4): # water to light
+                    if(line[0].isdigit()):
+                        processedGold["water_to_light"].append(line.split())
+                elif(currentSection == 5): # light to temperature
+                    if(line[0].isdigit()):
+                        processedGold["light_to_temperature"].append(line.split())
+                elif(currentSection == 6): # temperature to humidity
+                    if(line[0].isdigit()):
+                        processedGold["temperature_to_humidity"].append(line.split())
+                elif(currentSection == 7): # humidity to location
+                    if(line[0].isdigit()):
+                        processedGold["humidity_to_location"].append(line.split())
     except:
         raise FileNotFoundError(f"Day 5's gold import file cannot be found!")
     # Returning the found processed silver, and gold, imports.
@@ -103,6 +139,7 @@ def FindShortestRoute(num, map):
     return num # Return same number if not mapped on
 
 def SilverSolution(solutionData):
+    print("\nStarting Silver Solution...")
     # Variable for storing the final locations of seeds.
     seedLocations = []
     # Loop through each seed and send it down the map.
@@ -127,20 +164,20 @@ def SilverSolution(solutionData):
     return min(seedLocations)
 
 def GoldSolution(solutionData):
-    """
-    Processes the provided solution data to find the golden solution.
+    print("\nStarting Gold Solution...")
+    #TODO: To save on time, I am brute-forcing this. But you could probably do it faster with more clever transforms between ranges rather than just individual numbers.
+    #TODO: For example, instead of transforming [1-10] as 1,2,3,4,5,6... you could instead just transform the whole range equally.
+    smallestSeed = inf
+    #
+    # Similiar to the approach of the past one.
+    # Loop through every pair of seeds:
+    #   # Find map for them. For each map, if it is found, find the exact range and make a new set with that range. 
+    #   EXAMPLE: [1..10] with map [2..3] should split into [1], [2..3], [4..10]
+    #   Apply the differneces to these new ranges.
+    #   Rpeat the above steps for all te ranges provided in the seeds
+    totalSeeds = []
+    #
+    for seeds in range (0, len(solutionData["seeds"]), 2):
 
-    This function takes in data, typically from a file or a similar source, processes it to figure out the solution, 
-    and then returns that solution. The current implementation is a placeholder and indicates if the day's solution 
-    has not been completed yet.
-
-    Args:
-        solutionData (type): The data that needs to be processed to find the solution. 
-                             The exact type of this data depends on what the solution requires.
-
-    Returns:
-        str: The results of the current day.
-    """
-    #TODO: Process the data, figure out the solution, and return the solution.
-    print("")
-    return "Day has not been completed yet!"
+    # Then just return the smallest location.
+    return totalSeeds
