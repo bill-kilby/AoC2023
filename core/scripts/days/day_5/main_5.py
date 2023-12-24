@@ -1,5 +1,6 @@
 from math import inf
 import os
+from turtle import distance
 
 # TODO: Remove all the int() calls. its inefficient, just do it on parsing.
 
@@ -163,12 +164,53 @@ def SilverSolution(solutionData):
     # Then just return the smallest location.
     return min(seedLocations)
 
+def FindShortestRanges(ranges, map):
+    # where ranges are the possible ranges and the maps are the maps.
+    # for each range in ranges:
+    #   for each path in map
+    #       if any part of range is in map
+    #           split part of map in range with part outside
+    #           apply transformation of map in range
+    newRanges = []
+    # Loop through every range.
+    for distanceRange in ranges:
+        hasBeenSplit = False
+        # For each range, check if its in any map
+        for path in map:
+            print(f"\nChecking {distanceRange} in {path}!")
+            if (int(path[1]) <= distanceRange[0] <= int(path[1])+int(path[2])):
+                # If start of range is inside of path.
+                print(f"First part in range! -> {path[1]} < {distanceRange[0]} < {int(path[1])+int(path[2])}")
+                if (distanceRange[1] > int(path[1])+int(path[2])):
+                    #TODO: I NEED TO APPLY THE CHANGES TO THE RANGE IN THE AREA..
+                    #TODO: -> WHY WHY WHY IS THIS NOT WORKING
+                    # I NEED TO MAKE IT SO THAT THE NUMBERS (IN) THE RANGES ARE CHANGED. NOT THE OTHERS. HOW?
+                    # (PATH + DIFFERENCE, END-OF-MAP-WITH-CONVERSION??? HOW DO I DO THIS)
+                    print("Splitting ranges!")
+                    # Add on the first range (start of range) -> (map end), with conversion.
+                    newRanges.append((int(path[0]) + abs(int(path[1]) - distanceRange[0]), int(path[1])+int(path[2])))
+                    # Add on second range (map end) -> (end of range), without conversion.
+                    newRanges.append((int(path[1])+int(path[2]), distanceRange[1]))
+                    # Let the algo know that it has been split
+                    hasBeenSplit = True
+                else:
+                    print(f"Second part in range! -> {path[1]} < {distanceRange[1]} < {int(path[1])+int(path[2])}")
+                    # If end of range is inside of path, all of it is inside of path, so just add updated range.
+                    newRanges.append((int(path[0]) + abs(int(path[1]) - distanceRange[0]), int(path[0]) + abs(int(path[1]) - distanceRange[1])))
+                    # Let the algo know the range has been updated.
+                    hasBeenSplit = True
+        # If no splits have been made, it just maps on as per usual.
+        if (hasBeenSplit == False):
+            newRanges.append(distanceRange)
+    # Remove any duplicates.
+    newRanges = list( dict.fromkeys(newRanges) )
+    print(f"From {ranges} to {newRanges}!")
+    return newRanges
+
+
 def GoldSolution(solutionData):
     print("\nStarting Gold Solution...")
-    #TODO: To save on time, I am brute-forcing this. But you could probably do it faster with more clever transforms between ranges rather than just individual numbers.
-    #TODO: For example, instead of transforming [1-10] as 1,2,3,4,5,6... you could instead just transform the whole range equally.
     smallestSeed = inf
-    #
     # Similiar to the approach of the past one.
     # Loop through every pair of seeds:
     #   # Find map for them. For each map, if it is found, find the exact range and make a new set with that range. 
@@ -176,8 +218,28 @@ def GoldSolution(solutionData):
     #   Apply the differneces to these new ranges.
     #   Rpeat the above steps for all te ranges provided in the seeds
     totalSeeds = []
-    #
-    for seeds in range (0, len(solutionData["seeds"]), 2):
-
+    # Loop through each pair of data.
+    for seed in range(0, len(solutionData["seeds"]), 2):
+        # Seed range contains tuples of (start_of_range, end_of_range)
+        seedRange = [(int(solutionData["seeds"][seed]),int(solutionData["seeds"][seed])+int(solutionData["seeds"][seed+1]))]
+        # Pass seedRange through a function that returns the new list of seed ranges.
+        soilRange = FindShortestRanges(seedRange, solutionData["seed_to_soil"])
+        print("============================================SOIL DONE")
+        fertilizerRange = FindShortestRanges(soilRange, solutionData["soil_to_fertilizer"])
+        print("============================================FERTILIZER DONE")
+        waterRange = FindShortestRanges(fertilizerRange, solutionData["fertilizer_to_water"])
+        print("============================================WATER DONE")
+        lightRange = FindShortestRanges(waterRange, solutionData["water_to_light"])
+        print("============================================LIGHT DONE")
+        temperatureRange = FindShortestRanges(lightRange, solutionData["light_to_temperature"])
+        print("============================================TEMPERATURE DONE")
+        humidityRange = FindShortestRanges(temperatureRange, solutionData["temperature_to_humidity"])
+        print("============================================HUMIDITY DONE")
+        locationRange = FindShortestRanges(humidityRange, solutionData["humidity_to_location"])
+        print("============================================LOCATION DONE")
+        # Loop through each possible location and store the shortest one.
+        for location in locationRange:
+            totalSeeds.append(location[0])
     # Then just return the smallest location.
-    return totalSeeds
+    print(totalSeeds)
+    return min(totalSeeds)
